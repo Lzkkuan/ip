@@ -1,4 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
 import Tasks.Task;
 import Tasks.Todo;
 import Tasks.Deadline;
@@ -12,9 +15,30 @@ public class Eve {
                                      + "|  __|      \\ \\/ /    |  __| \n"
                                      + "| |____      \\  /     | |____ \n"
                                      + "|______|      \\/      |______|\n";
-    private static final int MAX_TASKS = 100;
-    private static final Task[] tasks = new Task[MAX_TASKS];
-    private static int taskCount = 0;
+
+    // A-Collections: dynamic list for tasks
+    private static final List<Task> tasks = new ArrayList<>();
+
+    /** All supported commands, parsed case-insensitively from the first token */
+    private enum Command {
+        HELP, LIST, TODO, DEADLINE, EVENT, MARK, UNMARK, DELETE, BYE;
+
+        static Command from(String s) {
+            if (s == null) return null;
+            switch (s.toLowerCase()) {
+                case "help": return HELP;
+                case "list": return LIST;
+                case "todo": return TODO;
+                case "deadline": return DEADLINE;
+                case "event": return EVENT;
+                case "mark": return MARK;
+                case "unmark": return UNMARK;
+                case "delete": return DELETE;
+                case "bye": return BYE;
+                default: return null;
+            }
+        }
+    }
 
     public static void main(String[] args) {
         greet();
@@ -30,122 +54,144 @@ public class Eve {
         System.out.println(LINE);
     }
 
-    /** Main input loop: handles all commands */
+    /** Main input loop using enum-based command parsing */
     private static void runLoop() {
-        Scanner sc = new Scanner(System.in);
-        while (true) {
-            String input = sc.nextLine().trim();
+        try (Scanner sc = new Scanner(System.in)) { // auto-closes, no leak warning
+            while (true) {
+                if (!sc.hasNextLine()) {
+                    printWithLines("Goodbye (EOF).");
+                    return;
+                }
+                String input = sc.nextLine().trim();
+                if (input.isEmpty()) continue;
 
-            if (input.equals("bye")) {
-                break;
-            } else if (input.equals("list")) {
-                printList();
-            } else if (input.equals("help")) {
-                printHelp();
-            } else if (input.startsWith("mark ")) {
-                handleMark(input, true);
-            } else if (input.startsWith("unmark ")) {
-                handleMark(input, false);
-            } else if (input.startsWith("todo ")) {
-                handleTodo(input);
-            } else if (input.startsWith("deadline ")) {
-                handleDeadline(input);
-            } else if (input.startsWith("event ")) {
-                handleEvent(input);
-            } else if (!input.isEmpty()) {
-                // default: treat as a quick "todo" add for backward-compat
-                addTask(new Todo(input));
-            } else {
-                printWithLines("");
+                String[] parts = input.split("\\s+", 2);
+                Command cmd = Command.from(parts[0]);
+                String args = parts.length > 1 ? parts[1].trim() : "";
+
+                if (cmd == null) {
+                    printWithLines("Sorry, I don't understand that. Type 'help' to see available commands.");
+                    continue;
+                }
+
+                switch (cmd) {
+                    case BYE:
+                        return;
+                    case HELP:
+                        printHelp();
+                        break;
+                    case LIST:
+                        printList();
+                        break;
+                    case TODO:
+                        handleTodo(args);
+                        break;
+                    case DEADLINE:
+                        handleDeadline(args);
+                        break;
+                    case EVENT:
+                        handleEvent(args);
+                        break;
+                    case MARK:
+                        handleMark(args, true);
+                        break;
+                    case UNMARK:
+                        handleMark(args, false);
+                        break;
+                    case DELETE:
+                        handleDelete(args);
+                        break;
+                }
             }
         }
-        sc.close();
     }
 
-    /** Adds a task if capacity allows, printing the confirmation block */
+    /** Adds a task and prints the confirmation block */
     private static void addTask(Task t) {
-        if (taskCount >= MAX_TASKS) {
-            printWithLines("Sorry, the list is full (" + MAX_TASKS + " tasks).");
-            return;
-        }
-        tasks[taskCount++] = t;
-
+        tasks.add(t);
         System.out.println(LINE);
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + t.toString());
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        System.out.println("   " + t);
+        System.out.println(" Now you have " + pluralize(tasks.size(), "task") + " in the list.");
         System.out.println(LINE);
     }
 
     /** Handle 'todo <desc>' */
-    private static void handleTodo(String input) {
-        String desc = input.substring("todo".length()).trim();
-        if (desc.isEmpty()) {
-            printWithLines("Usage: todo <description>");
+    private static void handleTodo(String args) {
+        if (args.isEmpty()) {
+            printWithLines("Oops, I need more info. Usage: todo <description>");
             return;
         }
-        addTask(new Todo(desc));
+        addTask(new Todo(args));
     }
 
-    /** Handle 'deadline <desc> /by <when>' */
-    private static void handleDeadline(String input) {
-        String body = input.substring("deadline".length()).trim();
-        String[] parts = body.split(" /by ", 2);
-        if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-            printWithLines("Usage: deadline <description> /by <when>");
+    /** Handle 'deadline <desc> /by <when>' (treat times as strings) */
+    private static void handleDeadline(String args) {
+        args = args.trim();
+        int k = args.toLowerCase().lastIndexOf(" /by ");
+        if (k < 0) {
+            printWithLines("Oops, I need more info. Usage: deadline <description> /by <when>");
             return;
         }
-        addTask(new Deadline(parts[0].trim(), parts[1].trim()));
+        String desc = args.substring(0, k).trim();
+        String when = args.substring(k + 5).trim();
+        if (desc.isEmpty() || when.isEmpty()) {
+            printWithLines("Oops, I need more info. Usage: deadline <description> /by <when>");
+            return;
+        }
+        addTask(new Deadline(desc, when));
     }
 
-    /** Handle 'event <desc> /from <start> /to <end>' */
-    private static void handleEvent(String input) {
-        String body = input.substring("event".length()).trim();
-        String[] firstSplit = body.split(" /from ", 2);
-        if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
-            printWithLines("Usage: event <description> /from <start> /to <end>");
+    /** Handle 'event <desc> /from <start> /to <end>' (treat times as strings) */
+    private static void handleEvent(String args) {
+        args = args.trim();
+        int kFrom = args.toLowerCase().indexOf(" /from ");
+        int kTo   = args.toLowerCase().indexOf(" /to ", Math.max(kFrom + 1, 0));
+        if (kFrom < 0 || kTo < 0 || kTo <= kFrom) {
+            printWithLines("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
             return;
         }
-        String desc = firstSplit[0].trim();
-        String[] secondSplit = firstSplit[1].split(" /to ", 2);
-        if (secondSplit.length < 2 || secondSplit[0].trim().isEmpty() || secondSplit[1].trim().isEmpty()) {
-            printWithLines("Usage: event <description> /from <start> /to <end>");
+        String desc = args.substring(0, kFrom).trim();
+        String from = args.substring(kFrom + 7, kTo).trim();
+        String to   = args.substring(kTo + 5).trim();
+        if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) {
+            printWithLines("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
             return;
         }
-        addTask(new Event(desc, secondSplit[0].trim(), secondSplit[1].trim()));
+        addTask(new Event(desc, from, to));
     }
 
     /** Print the full task list */
     private static void printList() {
         System.out.println(LINE);
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             System.out.println(" No tasks yet.");
         } else {
             System.out.println(" Here are the tasks in your list:");
-            for (int i = 0; i < taskCount; i++) {
-                System.out.println(" " + (i + 1) + "." + tasks[i]);
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println(" " + (i + 1) + "." + tasks.get(i));
             }
         }
         System.out.println(LINE);
     }
 
-    /** Handle 'mark n' / 'unmark n' using Task methods */
-    private static void handleMark(String input, boolean toDone) {
-        Integer idx = parseIndex(input);
-        if (idx == null) {
-            printWithLines("Please provide a valid task number (e.g., \"" + (toDone ? "mark 2" : "unmark 2") + "\").");
+    /** Handle 'mark n' / 'unmark n' */
+    private static void handleMark(String args, boolean toDone) {
+        if (tasks.isEmpty()) {
+            printWithLines("No tasks yet—add one before marking.");
             return;
         }
-        if (idx < 1 || idx > taskCount) {
-            printWithLines("Please provide a valid task number (1-" + taskCount + ").");
+        if (!args.matches("\\d+")) {
+            printWithLines("Use a number only, e.g., \"" + (toDone ? "mark 2" : "unmark 2") + "\".");
             return;
         }
-        Task t = tasks[idx - 1];
-        if (toDone) {
-            t.markAsDone();
-        } else {
-            t.markAsNotDone();
+        int n = Integer.parseInt(args);
+        if (n < 1 || n > tasks.size()) {
+            printWithLines("Please provide a valid task number (1-" + tasks.size() + ").");
+            return;
         }
+        Task t = tasks.get(n - 1);
+        if (toDone) t.markAsDone(); else t.markAsNotDone();
 
         System.out.println(LINE);
         if (toDone) {
@@ -157,31 +203,44 @@ public class Eve {
         System.out.println(LINE);
     }
 
-    /** Print the list of available commands */
-    private static void printHelp() {
+    /** Handle 'delete n' */
+    private static void handleDelete(String args) {
+        if (tasks.isEmpty()) {
+            printWithLines("No tasks yet—add one before deleting.");
+            return;
+        }
+        if (!args.matches("\\d+")) {
+            printWithLines("Use a number only, e.g., \"delete 3\".");
+            return;
+        }
+        int n = Integer.parseInt(args);
+        if (n < 1 || n > tasks.size()) {
+            printWithLines("Please provide a valid task number (1-" + tasks.size() + ").");
+            return;
+        }
+        Task removed = tasks.remove(n - 1);
+
         System.out.println(LINE);
-        System.out.println(" Available commands:");
-        System.out.println("   help                      - Show this help message.");
-        System.out.println("   list                      - Show all tasks and status.");
-        System.out.println("   todo <desc>               - Add a ToDo task.");
-        System.out.println("   deadline <desc> /by <t>   - Add a Deadline with due time.");
-        System.out.println("   event <desc> /from <s> /to <e> - Add an Event with start/end.");
-        System.out.println("   mark N                    - Mark task N as done.");
-        System.out.println("   unmark N                  - Mark task N as not done.");
-        System.out.println("   <text>                    - Quick add a ToDo with that text.");
-        System.out.println("   bye                       - Exit the program.");
+        System.out.println(" Noted. I've removed this task:");
+        System.out.println("   " + removed);
+        System.out.println(" Now you have " + pluralize(tasks.size(), "task") + " in the list.");
         System.out.println(LINE);
     }
 
-    /** Parse the integer after a command */
-    private static Integer parseIndex(String input) {
-        String[] parts = input.split("\\s+");
-        if (parts.length < 2) return null;
-        try {
-            return Integer.parseInt(parts[1]);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+    /** Help text */
+    private static void printHelp() {
+        System.out.println(LINE);
+        System.out.println(" Available commands:");
+        System.out.println("   help                             - Show this help message.");
+        System.out.println("   list                             - Show all tasks and status.");
+        System.out.println("   todo <desc>                      - Add a ToDo task.");
+        System.out.println("   deadline <desc> /by <t>          - Add a Deadline with due time.");
+        System.out.println("   event <desc> /from <s> /to <e>   - Add an Event with start/end.");
+        System.out.println("   mark N                           - Mark task N as done.");
+        System.out.println("   unmark N                         - Mark task N as not done.");
+        System.out.println("   delete N                         - Delete task N from the list.");
+        System.out.println("   bye                              - Exit the program.");
+        System.out.println(LINE);
     }
 
     /** Exit message */
@@ -191,7 +250,10 @@ public class Eve {
         System.out.println(LINE);
     }
 
-    /** Print any text between horizontal lines */
+    /** Helpers */
+    private static String pluralize(int n, String word) {
+        return n + " " + word + (n == 1 ? "" : "s");
+    }
     private static void printWithLines(String message) {
         System.out.println(LINE);
         System.out.println(" " + message);
