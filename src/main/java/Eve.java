@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import Storage.Storage;
 import Tasks.Task;
 import Tasks.Todo;
 import Tasks.Deadline;
@@ -18,6 +19,8 @@ public class Eve {
 
     // A-Collections: dynamic list for tasks
     private static final List<Task> tasks = new ArrayList<>();
+
+    private static final Storage storage = new Storage("data/duke.txt"); 
 
     /** All supported commands, parsed case-insensitively from the first token */
     private enum Command {
@@ -41,6 +44,7 @@ public class Eve {
     }
 
     public static void main(String[] args) {
+        tasks.addAll(storage.load());
         greet();
         runLoop();
         exit();
@@ -109,6 +113,7 @@ public class Eve {
     /** Adds a task and prints the confirmation block */
     private static void addTask(Task t) {
         tasks.add(t);
+        storage.save(tasks);
         System.out.println(LINE);
         System.out.println(" Got it. I've added this task:");
         System.out.println("   " + t);
@@ -192,6 +197,7 @@ public class Eve {
         }
         Task t = tasks.get(n - 1);
         if (toDone) t.markAsDone(); else t.markAsNotDone();
+        storage.save(tasks);
 
         System.out.println(LINE);
         if (toDone) {
@@ -219,6 +225,7 @@ public class Eve {
             return;
         }
         Task removed = tasks.remove(n - 1);
+        storage.save(tasks);
 
         System.out.println(LINE);
         System.out.println(" Noted. I've removed this task:");
