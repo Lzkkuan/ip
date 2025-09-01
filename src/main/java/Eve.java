@@ -20,7 +20,7 @@ public class Eve {
     // A-Collections: dynamic list for tasks
     private static final List<Task> tasks = new ArrayList<>();
 
-    private static final Storage storage = new Storage("data/duke.txt"); 
+    private static final Storage storage = new Storage("data/EVEStorage.txt"); 
 
     /** All supported commands, parsed case-insensitively from the first token */
     private enum Command {
