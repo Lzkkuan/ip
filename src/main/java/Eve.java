@@ -2,6 +2,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import util.DateTimeUtil;
+
+
 import Storage.Storage;
 import Tasks.Task;
 import Tasks.Todo;
@@ -130,41 +135,62 @@ public class Eve {
         addTask(new Todo(args));
     }
 
-    /** Handle 'deadline <desc> /by <when>' (treat times as strings) */
+    /** Handle 'deadline <desc> /by <when>' (robust split; errors unchanged) */
     private static void handleDeadline(String args) {
-        args = args.trim();
-        int k = args.toLowerCase().lastIndexOf(" /by ");
-        if (k < 0) {
+        // Trim and split on "/by" ignoring case, allowing flexible spaces
+        String[] parts = args.trim().split("(?i)\\s*/by\\s+", 2);
+        if (parts.length < 2) {
             printWithLines("Oops, I need more info. Usage: deadline <description> /by <when>");
             return;
         }
-        String desc = args.substring(0, k).trim();
-        String when = args.substring(k + 5).trim();
+        String desc = parts[0].trim();
+        String when = parts[1].trim();
+
         if (desc.isEmpty() || when.isEmpty()) {
             printWithLines("Oops, I need more info. Usage: deadline <description> /by <when>");
             return;
         }
+
+        // Pass tokens through; Deadline can parse dates/times internally (Level 8)
         addTask(new Deadline(desc, when));
     }
 
-    /** Handle 'event <desc> /from <start> /to <end>' (treat times as strings) */
+    /** Handle 'event <desc> /from <start> /to <end>' (robust split + range check) */
     private static void handleEvent(String args) {
-        args = args.trim();
-        int kFrom = args.toLowerCase().indexOf(" /from ");
-        int kTo   = args.toLowerCase().indexOf(" /to ", Math.max(kFrom + 1, 0));
-        if (kFrom < 0 || kTo < 0 || kTo <= kFrom) {
+        String trimmed = args.trim();
+
+        String[] first = trimmed.split("(?i)\\s*/from\\s+", 2);
+        if (first.length < 2) {
             printWithLines("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
             return;
         }
-        String desc = args.substring(0, kFrom).trim();
-        String from = args.substring(kFrom + 7, kTo).trim();
-        String to   = args.substring(kTo + 5).trim();
+        String desc = first[0].trim();
+        String rest = first[1].trim();
+
+        String[] second = rest.split("(?i)\\s*/to\\s+", 2);
+        if (second.length < 2) {
+            printWithLines("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
+            return;
+        }
+        String from = second[0].trim();
+        String to   = second[1].trim();
+
         if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) {
             printWithLines("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
             return;
         }
-        addTask(new Event(desc, from, to));
+
+        // NEW: if both sides parse, enforce from <= to
+        Optional<LocalDateTime> fromDT = DateTimeUtil.parseDateTime(from);
+        Optional<LocalDateTime> toDT   = DateTimeUtil.parseDateTime(to);
+        if (fromDT.isPresent() && toDT.isPresent() && fromDT.get().isAfter(toDT.get())) {
+            printWithLines("Sorry, that time range looks invalid: start is after end.");
+            return;
+        }
+
+        addTask(new Event(desc, from, to)); // Event will also parse for pretty-printing
     }
+
 
     /** Print the full task list */
     private static void printList() {

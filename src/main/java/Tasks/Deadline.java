@@ -1,24 +1,26 @@
 package Tasks;
 
+import util.DateTimeUtil;
+import java.time.LocalDateTime;
+
 public class Deadline extends Task {
-    private final String by;
+    private final LocalDateTime when; // parsed; may be null
+    private final String raw;         // original text if parse failed
 
-    public Deadline(String description, String by) {
+    public Deadline(String description, String byText) {
         super(description);
-        this.by = by;
+        this.when = DateTimeUtil.parseDateTime(byText).orElse(null);
+        this.raw = (when == null) ? byText : null;
     }
 
-    public String getBy() {
-        return by;
-    }
+    public LocalDateTime getWhen() { return when; }
+    public String getByToken() { return (when != null) ? DateTimeUtil.toIso(when) : raw; }
 
-    @Override
-    protected String getTypeIcon() {
-        return "D";
-    }
+    @Override protected String getTypeIcon() { return "D"; }
 
     @Override
     public String toString() {
-        return super.toString() + " (by: " + by + ")";
+        String shown = (when != null) ? DateTimeUtil.pretty(when) : raw;
+        return super.toString() + " (by: " + shown + ")";
     }
 }
