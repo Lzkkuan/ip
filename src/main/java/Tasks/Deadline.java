@@ -8,6 +8,10 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    public String getBy() {
+        return by;
+    }
+
     @Override
     protected String getTypeIcon() {
         return "D";
@@ -15,7 +19,6 @@ public class Deadline extends Task {
 
     @Override
     public String toString() {
-        // e.g. [D][ ] return book (by: Sunday)
         return super.toString() + " (by: " + by + ")";
     }
 }

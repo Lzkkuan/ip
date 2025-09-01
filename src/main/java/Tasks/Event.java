@@ -10,6 +10,9 @@ public class Event extends Task {
         this.to = to;
     }
 
+    public String getFrom() { return from; }
+    public String getTo()   { return to; }
+
     @Override
     protected String getTypeIcon() {
         return "E";
@@ -17,7 +20,10 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        // e.g. [E][ ] project meeting (from: Mon 2pm to: 4pm)
+        if (to == null || to.isEmpty()) {
+            // allow legacy combined range
+            return super.toString() + " (from: " + from + ")";
+        }
         return super.toString() + " (from: " + from + " to: " + to + ")";
     }
 }
