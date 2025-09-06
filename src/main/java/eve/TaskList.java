@@ -19,8 +19,8 @@ public class TaskList {
     /**
      * Creates an empty task list.
      */
-    public TaskList() { 
-        this.tasks = new ArrayList<>(); 
+    public TaskList() {
+        this.tasks = new ArrayList<>();
     }
 
     /**
@@ -28,8 +28,8 @@ public class TaskList {
      *
      * @param initial tasks to copy into this list
      */
-    public TaskList(List<Task> initial) { 
-        this.tasks = new ArrayList<>(initial); 
+    public TaskList(List<Task> initial) {
+        this.tasks = new ArrayList<>(initial);
     }
 
     /**
@@ -37,8 +37,8 @@ public class TaskList {
      *
      * @return the number of tasks
      */
-    public int size() { 
-        return tasks.size(); 
+    public int size() {
+        return tasks.size();
     }
 
     /**
@@ -48,8 +48,8 @@ public class TaskList {
      * @return the task at that index
      * @throws IndexOutOfBoundsException if the index is invalid
      */
-    public Task get(int idx0) { 
-        return tasks.get(idx0); 
+    public Task get(int idx0) {
+        return tasks.get(idx0);
     }
 
     /**
@@ -61,8 +61,8 @@ public class TaskList {
      *
      * @return the list of tasks
      */
-    public List<Task> asList() { 
-        return tasks; 
+    public List<Task> asList() {
+        return tasks;
     }
 
     /**
@@ -71,9 +71,9 @@ public class TaskList {
      * @param t the task to add
      * @return the same task for convenience
      */
-    public Task add(Task t) { 
-        tasks.add(t); 
-        return t; 
+    public Task add(Task t) {
+        tasks.add(t);
+        return t;
     }
 
     /**
@@ -83,8 +83,8 @@ public class TaskList {
      * @return the deleted task
      * @throws IndexOutOfBoundsException if the index is invalid
      */
-    public Task deleteAt(int idx0) { 
-        return tasks.remove(idx0); 
+    public Task deleteAt(int idx0) {
+        return tasks.remove(idx0);
     }
 
     /**

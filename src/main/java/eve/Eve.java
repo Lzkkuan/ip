@@ -5,7 +5,7 @@ import java.util.List;
 import eve.ui.ui;
 import eve.parser.parser;
 import eve.parser.EveException;
-import eve.parser.parser.Command; 
+import eve.parser.parser.Command;
 import eve.parser.parser.DeadlineParts;
 import eve.parser.parser.EventParts;
 import eve.storage.Storage;
@@ -58,17 +58,18 @@ public class Eve {
         boolean exit = false;
         while (!exit) {
             String full = ui.readCommand();
-            if (full == null) { 
-                ui.showError("Goodbye (EOF)."); 
-                break; 
+            if (full == null) {
+                ui.showError("Goodbye (EOF).");
+                break;
             } // EOF
             full = full.trim();
-            if (full.isEmpty()) continue;
+            if (full.isEmpty())
+                continue;
 
             Command cmd = parser.parseCommand(full);
-            if (cmd == null) { 
-                ui.showUnknown(); 
-                continue; 
+            if (cmd == null) {
+                ui.showUnknown();
+                continue;
             }
 
             String args = parser.args(full);
@@ -103,9 +104,9 @@ public class Eve {
                     }
                     case MARK: {
                         int n = parser.parseIndex(args, true);
-                        if (n < 1 || n > tasks.size()) { 
-                            ui.showError("Please provide a valid task number (1-" + tasks.size() + ")."); 
-                            break; 
+                        if (n < 1 || n > tasks.size()) {
+                            ui.showError("Please provide a valid task number (1-" + tasks.size() + ").");
+                            break;
                         }
                         Task t = tasks.setDone(n - 1, true);
                         storage.save(tasks.asList());
@@ -114,9 +115,9 @@ public class Eve {
                     }
                     case UNMARK: {
                         int n = parser.parseIndex(args, false);
-                        if (n < 1 || n > tasks.size()) { 
-                            ui.showError("Please provide a valid task number (1-" + tasks.size() + ")."); 
-                            break; 
+                        if (n < 1 || n > tasks.size()) {
+                            ui.showError("Please provide a valid task number (1-" + tasks.size() + ").");
+                            break;
                         }
                         Task t = tasks.setDone(n - 1, false);
                         storage.save(tasks.asList());
@@ -125,9 +126,9 @@ public class Eve {
                     }
                     case DELETE: {
                         int n = parser.parseDeleteIndex(args);
-                        if (n < 1 || n > tasks.size()) { 
-                            ui.showError("Please provide a valid task number (1-" + tasks.size() + ")."); 
-                            break; 
+                        if (n < 1 || n > tasks.size()) {
+                            ui.showError("Please provide a valid task number (1-" + tasks.size() + ").");
+                            break;
                         }
                         Task removed = tasks.deleteAt(n - 1);
                         storage.save(tasks.asList());
