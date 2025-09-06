@@ -1,8 +1,9 @@
-package ui;
+package eve.ui;
 
 import java.util.Scanner;
 import java.util.List;
-import Tasks.Task;
+
+import eve.tasks.Task;
 
 public class ui {
     private static final String LINE = "____________________________________________________________";

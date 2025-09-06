@@ -1,8 +1,9 @@
-package parser;
+package eve.parser;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import util.DateTimeUtil;
+
+import eve.util.DateTimeUtil;
 
 public final class parser {
     private parser() {}

@@ -1,6 +1,7 @@
-package Tasks;
+package eve.tasks;
 
-import util.DateTimeUtil;
+
+import eve.util.DateTimeUtil;
 import java.time.LocalDateTime;
 
 public class Event extends Task {
