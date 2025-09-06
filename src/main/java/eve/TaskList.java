@@ -104,4 +104,16 @@ public class TaskList {
         }
         return t;
     }
+
+    /** Returns tasks whose descriptions contain the needle (case-insensitive). */
+    public List<eve.tasks.Task> find(String needle) {
+        String n = needle.toLowerCase();
+        List<eve.tasks.Task> matches = new ArrayList<>();
+        for (eve.tasks.Task t : tasks) {
+            if (t.getDescription().toLowerCase().contains(n)) {
+                matches.add(t);
+            }
+        }
+        return matches;
+    }
 }
