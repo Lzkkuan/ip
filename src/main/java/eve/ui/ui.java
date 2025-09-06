@@ -120,4 +120,56 @@ public class ui {
         System.out.println(" " + message);
         System.out.println(LINE);
     }
+
+    public String renderHelp() {
+        return String.join("\n",
+                LINE,
+                " Commands:",
+                "  help                  - Show this help",
+                "  list                  - List tasks",
+                "  todo <desc>           - Add todo",
+                "  deadline <d> /by <t>  - Add deadline",
+                "  event <d> /from <s> /to <e> - Add event",
+                "  mark <n> / unmark <n> - Toggle done",
+                "  delete <n>            - Delete task",
+                "  find <kw>             - Search tasks (if you implemented Level-9)",
+                "  bye                   - Exit",
+                LINE);
+    }
+
+    public String renderList(List<Task> tasks) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(LINE).append("\n Here are the tasks in your list:\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            sb.append(" ").append(i + 1).append(".").append(tasks.get(i).toString()).append("\n");
+        }
+        sb.append(LINE);
+        return sb.toString();
+    }
+
+    public String renderAdded(Task t, int size) {
+        return String.join("\n",
+                LINE,
+                " Got it. I've added this task:",
+                "   " + t.toString(),
+                " Now you have " + size + " tasks in the list.",
+                LINE);
+    }
+
+    public String renderMarked(Task t, boolean done) {
+        return String.join("\n",
+                LINE,
+                done ? " Nice! I've marked this task as done:" : " OK, I've marked this task as not done yet:",
+                "   " + t.toString(),
+                LINE);
+    }
+
+    public String renderDeleted(Task t, int size) {
+        return String.join("\n",
+                LINE,
+                " Noted. I've removed this task:",
+                "   " + t.toString(),
+                " Now you have " + size + " tasks in the list.",
+                LINE);
+    }
 }

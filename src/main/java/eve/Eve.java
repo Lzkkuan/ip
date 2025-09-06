@@ -160,4 +160,73 @@ public class Eve {
     public static void main(String[] args) {
         new Eve().run();
     }
+
+    public String getResponse(String full) {
+        if (full == null)
+            return "Please type a command.";
+        full = full.trim();
+        if (full.isEmpty())
+            return "Please type a command.";
+        Command cmd = parser.parseCommand(full);
+        if (cmd == null)
+            return "Sorry, I don't know that command. Type `help` for a list.";
+
+        String args = parser.args(full);
+        try {
+            switch (cmd) {
+                case HELP:
+                    return ui.renderHelp();
+                case LIST:
+                    return ui.renderList(tasks.asList());
+                case TODO: {
+                    String desc = parser.parseTodoDesc(args);
+                    Task t = tasks.add(new Todo(desc));
+                    storage.save(tasks.asList());
+                    return ui.renderAdded(t, tasks.size());
+                }
+                case DEADLINE: {
+                    DeadlineParts p = parser.parseDeadline(args);
+                    Task t = tasks.add(new Deadline(p.desc, p.when));
+                    storage.save(tasks.asList());
+                    return ui.renderAdded(t, tasks.size());
+                }
+                case EVENT: {
+                    EventParts p = parser.parseEvent(args);
+                    Task t = tasks.add(new Event(p.desc, p.from, p.to));
+                    storage.save(tasks.asList());
+                    return ui.renderAdded(t, tasks.size());
+                }
+                case MARK: {
+                    int n = parser.parseIndex(args, true);
+                    if (n < 1 || n > tasks.size())
+                        return "Please provide a valid task number (1-" + tasks.size() + ").";
+                    Task t = tasks.setDone(n - 1, true);
+                    storage.save(tasks.asList());
+                    return ui.renderMarked(t, true);
+                }
+                case UNMARK: {
+                    int n = parser.parseIndex(args, false);
+                    if (n < 1 || n > tasks.size())
+                        return "Please provide a valid task number (1-" + tasks.size() + ").";
+                    Task t = tasks.setDone(n - 1, false);
+                    storage.save(tasks.asList());
+                    return ui.renderMarked(t, false);
+                }
+                case DELETE: {
+                    int n = parser.parseDeleteIndex(args);
+                    if (n < 1 || n > tasks.size())
+                        return "Please provide a valid task number (1-" + tasks.size() + ").";
+                    Task removed = tasks.deleteAt(n - 1);
+                    storage.save(tasks.asList());
+                    return ui.renderDeleted(removed, tasks.size());
+                }
+                case BYE:
+                    return "Bye. Hope to see you again soon!";
+                default:
+                    return "Sorry, I don't know that command.";
+            }
+        } catch (EveException e) {
+            return e.getMessage();
+        }
+    }
 }
