@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'checkstyle'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
@@ -15,7 +16,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17) // use 11 if your setup requires it
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -25,7 +26,6 @@ tasks.withType(JavaCompile).configureEach {
 
 test {
     useJUnitPlatform()
-
     testLogging {
         events "passed", "skipped", "failed"
         showExceptions true
@@ -33,6 +33,20 @@ test {
         showCauses true
         showStackTraces true
         showStandardStreams = false
+    }
+}
+
+checkstyle {
+    toolVersion = '11.0.0'
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+    configProperties = [:]  // Empty properties for now
+    ignoreFailures = false
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = false
+        html.required = true
     }
 }
 
@@ -48,3 +62,5 @@ shadowJar {
 run {
     standardInput = System.in
 }
+
+// Remove all the task dependency fixes for now to simplify
