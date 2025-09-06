@@ -140,9 +140,10 @@ public class Eve {
                         ui.showDeleted(removed, tasks.size());
                         break;
                     }
-                    case BYE:
+                    case BYE: {
                         exit = true;
                         break;
+                    }
                 }
             } catch (EveException e) {
                 ui.showError(e.getMessage());
