@@ -21,7 +21,7 @@ public final class parser {
      * Enumerates the set of supported commands that the chatbot recognizes.
      */
     public enum Command {
-        HELP, LIST, TODO, DEADLINE, EVENT, MARK, UNMARK, DELETE, BYE
+        HELP, LIST, TODO, FIND, DEADLINE, EVENT, MARK, UNMARK, DELETE, BYE
     }
 
     /**
@@ -56,6 +56,8 @@ public final class parser {
                 return Command.DELETE;
             case "bye":
                 return Command.BYE;
+            case "find":
+                return Command.FIND;
             default:
                 return null;
         }
@@ -101,6 +103,16 @@ public final class parser {
         if (!args.matches("\\d+"))
             throw new EveException("Use a number only, e.g., \"" + (toDone ? "mark 2" : "unmark 2") + "\".");
         return Integer.parseInt(args);
+    }
+
+    /** Parse 'find <keyword>' (requires non-blank). */
+    public static String parseFind(String args) throws EveException {
+        if (args == null)
+            args = "";
+        String q = args.trim();
+        if (q.isEmpty())
+            throw new EveException("Oops, I need more info. Usage: find <keyword>");
+        return q;
     }
 
     /**

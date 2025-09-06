@@ -95,6 +95,11 @@ public class Eve {
                         ui.showAdded(t, tasks.size());
                         break;
                     }
+                    case FIND: {
+                        String q = parser.parseFind(args);
+                        ui.showFindResults(tasks.find(q));
+                        break;
+                    }
                     case EVENT: {
                         EventParts p = parser.parseEvent(args);
                         Task t = tasks.add(new Event(p.desc, p.from, p.to));

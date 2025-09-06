@@ -8,11 +8,11 @@ import eve.tasks.Task;
 public class ui {
     private static final String LINE = "____________________________________________________________";
     private static final String LOGO = " ______   __      __   ______ \n"
-                                     + "| _____|  \\ \\    / /  | _____|\n"
-                                     + "| |__      \\ \\  / /   | |__  \n"
-                                     + "|  __|      \\ \\/ /    |  __| \n"
-                                     + "| |____      \\  /     | |____ \n"
-                                     + "|______|      \\/      |______|\n";
+            + "| _____|  \\ \\    / /  | _____|\n"
+            + "| |__      \\ \\  / /   | |__  \n"
+            + "|  __|      \\ \\/ /    |  __| \n"
+            + "| |____      \\  /     | |____ \n"
+            + "|______|      \\/      |______|\n";
     private final Scanner sc = new Scanner(System.in);
 
     public void showWelcome() {
@@ -23,11 +23,14 @@ public class ui {
     }
 
     public String readCommand() {
-        if (!sc.hasNextLine()) return null; // EOF
+        if (!sc.hasNextLine())
+            return null; // EOF
         return sc.nextLine();
     }
 
-    public void showLine() { System.out.println(LINE); }
+    public void showLine() {
+        System.out.println(LINE);
+    }
 
     public void showGoodbye() {
         System.out.println(LINE);
@@ -39,7 +42,9 @@ public class ui {
         printWithLines("Sorry, I don't understand that. Type 'help' to see available commands.");
     }
 
-    public void showError(String msg) { printWithLines(msg); }
+    public void showError(String msg) {
+        printWithLines(msg);
+    }
 
     public void showAdded(Task t, int count) {
         System.out.println(LINE);
@@ -51,8 +56,10 @@ public class ui {
 
     public void showMarked(Task t, boolean toDone) {
         System.out.println(LINE);
-        if (toDone) System.out.println(" Nice! I've marked this task as done:");
-        else System.out.println(" OK, I've marked this task as not done yet:");
+        if (toDone)
+            System.out.println(" Nice! I've marked this task as done:");
+        else
+            System.out.println(" OK, I've marked this task as not done yet:");
         System.out.println("   " + t);
         System.out.println(LINE);
     }
@@ -78,11 +85,26 @@ public class ui {
         System.out.println(LINE);
     }
 
+    /** Print search results in the required format. */
+    public void showFindResults(java.util.List<eve.tasks.Task> matches) {
+        System.out.println(LINE);
+        if (matches.isEmpty()) {
+            System.out.println(" No matching tasks found.");
+        } else {
+            System.out.println(" Here are the matching tasks in your list:");
+            for (int i = 0; i < matches.size(); i++) {
+                System.out.println(" " + (i + 1) + "." + matches.get(i));
+            }
+        }
+        System.out.println(LINE);
+    }
+
     public void showHelp() {
         System.out.println(LINE);
         System.out.println(" Available commands:");
         System.out.println("   help                             - Show this help message.");
         System.out.println("   list                             - Show all tasks and status.");
+        System.out.println("   find <keyword>                   - Search tasks by keyword.");
         System.out.println("   todo <desc>                      - Add a ToDo task.");
         System.out.println("   deadline <desc> /by <time>       - Add a Deadline.");
         System.out.println("   event <desc> /from <start> /to <end> - Add an Event.");
