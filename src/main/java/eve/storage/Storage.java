@@ -1,15 +1,17 @@
-package Storage;
+package eve.storage;
 
-import Tasks.Task;
-import Tasks.Todo;
-import Tasks.Deadline;
-import Tasks.Event;
+import eve.tasks.Task;
+import eve.tasks.Todo;
+import eve.tasks.Deadline;
+import eve.tasks.Event;
+
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 /* no need to parse dates here; tasks will do it */
+
 
 public class Storage {
     private final Path file;

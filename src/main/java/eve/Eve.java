@@ -1,16 +1,19 @@
+package eve;
+
 import java.util.List;
 
-import Storage.Storage;
-import Tasks.Task;
-import Tasks.Todo;
-import parser.EveException;
-import parser.parser;
-import parser.parser.Command;
-import parser.parser.DeadlineParts;
-import parser.parser.EventParts;
-import ui.ui;
-import Tasks.Deadline;
-import Tasks.Event;
+import eve.ui.ui;
+import eve.parser.parser;
+import eve.parser.EveException;
+import eve.parser.parser.Command; 
+import eve.parser.parser.DeadlineParts;
+import eve.parser.parser.EventParts;
+import eve.storage.Storage;
+import eve.tasks.Task;
+import eve.tasks.Todo;
+import eve.tasks.Deadline;
+import eve.tasks.Event;
+
 
 public class Eve {
     private final ui ui = new ui();
