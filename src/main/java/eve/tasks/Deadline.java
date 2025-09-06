@@ -11,16 +11,22 @@ import java.time.LocalDateTime;
  * If parsing fails, the raw user input is stored instead.
  */
 public class Deadline extends Task {
-    /** The parsed due date/time of the deadline, or {@code null} if parsing failed. */
+    /**
+     * The parsed due date/time of the deadline, or {@code null} if parsing failed.
+     */
     private final LocalDateTime when;
-    /** The raw text provided by the user if parsing failed; {@code null} otherwise. */
+    /**
+     * The raw text provided by the user if parsing failed; {@code null} otherwise.
+     */
     private final String raw;
 
     /**
-     * Constructs a {@code Deadline} with the given description and due date/time string.
+     * Constructs a {@code Deadline} with the given description and due date/time
+     * string.
      *
      * @param description the description of the deadline task
-     * @param byText      the due date/time text (parsed if possible, stored raw otherwise)
+     * @param byText      the due date/time text (parsed if possible, stored raw
+     *                    otherwise)
      */
     public Deadline(String description, String byText) {
         super(description);
@@ -31,15 +37,18 @@ public class Deadline extends Task {
     /**
      * Returns the parsed due date/time of this deadline.
      *
-     * @return the {@link LocalDateTime} due date/time, or {@code null} if parsing failed
+     * @return the {@link LocalDateTime} due date/time, or {@code null} if parsing
+     *         failed
      */
-    public LocalDateTime getWhen() { return when; }
+    public LocalDateTime getWhen() {
+        return when;
+    }
 
     /**
      * Returns a token representing the due date/time of this deadline.
      * <ul>
-     *   <li>If parsed successfully, returns the ISO string (yyyy-MM-ddTHH:mm).</li>
-     *   <li>If parsing failed, returns the raw user input.</li>
+     * <li>If parsed successfully, returns the ISO string (yyyy-MM-ddTHH:mm).</li>
+     * <li>If parsing failed, returns the raw user input.</li>
      * </ul>
      *
      * @return ISO string or raw input of the due date/time
@@ -54,7 +63,9 @@ public class Deadline extends Task {
      * @return the string {@code "D"}
      */
     @Override
-    protected String getTypeIcon() { return "D"; }
+    protected String getTypeIcon() {
+        return "D";
+    }
 
     /**
      * Returns a string representation of this deadline, including type, status,

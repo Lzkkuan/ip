@@ -13,13 +13,16 @@ import eve.util.DateTimeUtil;
  * representations (enums, indices, or parts objects) that the main
  * application logic can handle.
  */
-public final class Parser {
-    private Parser() {}
+public final class parser {
+    private parser() {
+    }
 
     /**
      * Enumerates the set of supported commands that the chatbot recognizes.
      */
-    public enum Command { HELP, LIST, TODO, DEADLINE, EVENT, MARK, UNMARK, DELETE, BYE }
+    public enum Command {
+        HELP, LIST, TODO, DEADLINE, EVENT, MARK, UNMARK, DELETE, BYE
+    }
 
     /**
      * Parses the first word of the given input into a {@link Command}.
@@ -28,21 +31,33 @@ public final class Parser {
      * @return the parsed {@link Command}, or {@code null} if unknown
      */
     public static Command parseCommand(String full) {
-        if (full == null) return null;
+        if (full == null)
+            return null;
         String trimmed = full.trim();
-        if (trimmed.isEmpty()) return null;
+        if (trimmed.isEmpty())
+            return null;
         String head = trimmed.split("\\s+", 2)[0].toLowerCase();
         switch (head) {
-            case "help": return Command.HELP;
-            case "list": return Command.LIST;
-            case "todo": return Command.TODO;
-            case "deadline": return Command.DEADLINE;
-            case "event": return Command.EVENT;
-            case "mark": return Command.MARK;
-            case "unmark": return Command.UNMARK;
-            case "delete": return Command.DELETE;
-            case "bye": return Command.BYE;
-            default: return null;
+            case "help":
+                return Command.HELP;
+            case "list":
+                return Command.LIST;
+            case "todo":
+                return Command.TODO;
+            case "deadline":
+                return Command.DEADLINE;
+            case "event":
+                return Command.EVENT;
+            case "mark":
+                return Command.MARK;
+            case "unmark":
+                return Command.UNMARK;
+            case "delete":
+                return Command.DELETE;
+            case "bye":
+                return Command.BYE;
+            default:
+                return null;
         }
     }
 
@@ -73,7 +88,7 @@ public final class Parser {
     /**
      * Parses a numeric index for mark/unmark commands.
      *
-     * @param args the argument string, expected to be a number
+     * @param args   the argument string, expected to be a number
      * @param toDone whether this is for mark (true) or unmark (false),
      *               used to customize the error message
      * @return the parsed integer index
@@ -81,7 +96,8 @@ public final class Parser {
      */
     public static int parseIndex(String args, boolean toDone) throws EveException {
         if (args == null || args.trim().isEmpty())
-            throw new EveException("Please provide a task number (e.g., \"" + (toDone ? "mark 2" : "unmark 2") + "\").");
+            throw new EveException(
+                    "Please provide a task number (e.g., \"" + (toDone ? "mark 2" : "unmark 2") + "\").");
         if (!args.matches("\\d+"))
             throw new EveException("Use a number only, e.g., \"" + (toDone ? "mark 2" : "unmark 2") + "\".");
         return Integer.parseInt(args);
@@ -113,7 +129,8 @@ public final class Parser {
      */
     public static DeadlineParts parseDeadline(String args) throws EveException {
         String[] parts = args.trim().split("(?i)\\s*/by\\s+", 2);
-        if (parts.length < 2) throw new EveException("Oops, I need more info. Usage: deadline <description> /by <when>");
+        if (parts.length < 2)
+            throw new EveException("Oops, I need more info. Usage: deadline <description> /by <when>");
         String desc = parts[0].trim();
         String when = parts[1].trim();
         if (desc.isEmpty() || when.isEmpty())
@@ -132,12 +149,14 @@ public final class Parser {
      */
     public static EventParts parseEvent(String args) throws EveException {
         String[] first = args.trim().split("(?i)\\s*/from\\s+", 2);
-        if (first.length < 2) throw new EveException("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
+        if (first.length < 2)
+            throw new EveException("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
         String desc = first[0].trim();
         String[] second = first[1].split("(?i)\\s*/to\\s+", 2);
-        if (second.length < 2) throw new EveException("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
+        if (second.length < 2)
+            throw new EveException("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
         String from = second[0].trim();
-        String to   = second[1].trim();
+        String to = second[1].trim();
         if (desc.isEmpty() || from.isEmpty() || to.isEmpty())
             throw new EveException("Oops, I need more info. Usage: event <description> /from <start> /to <end>");
 
@@ -159,7 +178,10 @@ public final class Parser {
         /** The deadline string provided by the user. */
         public final String when;
 
-        public DeadlineParts(String d, String w) { this.desc = d; this.when = w; }
+        public DeadlineParts(String d, String w) {
+            this.desc = d;
+            this.when = w;
+        }
     }
 
     /**
@@ -173,6 +195,10 @@ public final class Parser {
         /** The end time string provided by the user. */
         public final String to;
 
-        public EventParts(String d, String f, String t) { this.desc = d; this.from = f; this.to = t; }
+        public EventParts(String d, String f, String t) {
+            this.desc = d;
+            this.from = f;
+            this.to = t;
+        }
     }
 }

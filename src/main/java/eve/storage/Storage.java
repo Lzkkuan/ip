@@ -14,12 +14,15 @@ import eve.tasks.Event;
  * Handles loading and saving tasks to persistent storage on disk.
  * <p>
  * Tasks are stored in a plain text file with a simple line-based format:
+ * 
  * <pre>
  *   T | 1 | read book
  *   D | 0 | return book | 2019-12-02
  *   E | 0 | meeting | 2019-12-02T14:00 | 2019-12-02T16:00
  * </pre>
- * Each line represents a task of type {@code Todo}, {@code Deadline}, or {@code Event}.
+ * 
+ * Each line represents a task of type {@code Todo}, {@code Deadline}, or
+ * {@code Event}.
  * Parsing of dates/times is delegated to the individual task classes.
  */
 public class Storage {
@@ -29,7 +32,8 @@ public class Storage {
     /**
      * Constructs a {@code Storage} object for the given relative file path.
      *
-     * @param relativePath the relative path to the data file (e.g. {@code "data/eve.txt"})
+     * @param relativePath the relative path to the data file (e.g.
+     *                     {@code "data/eve.txt"})
      */
     public Storage(String relativePath) {
         this.file = Paths.get(relativePath);
@@ -38,8 +42,10 @@ public class Storage {
     /**
      * Loads all tasks from the data file into memory.
      * <p>
-     * If the file does not exist, it will be created along with its parent directories.
-     * If the file contains corrupted or unrecognized lines, those lines will be ignored.
+     * If the file does not exist, it will be created along with its parent
+     * directories.
+     * If the file contains corrupted or unrecognized lines, those lines will be
+     * ignored.
      *
      * @return a list of {@link Task} objects loaded from storage
      */
@@ -100,9 +106,9 @@ public class Storage {
      * <p>
      * Supports the following types:
      * <ul>
-     *   <li>{@code T} = Todo</li>
-     *   <li>{@code D} = Deadline</li>
-     *   <li>{@code E} = Event</li>
+     * <li>{@code T} = Todo</li>
+     * <li>{@code D} = Deadline</li>
+     * <li>{@code E} = Event</li>
      * </ul>
      * If parsing fails, returns {@code null}.
      *
@@ -110,9 +116,11 @@ public class Storage {
      * @return the corresponding {@link Task}, or {@code null} if parsing failed
      */
     private Task parseLine(String line) {
-        if (line == null) return null;
+        if (line == null)
+            return null;
         String[] parts = line.split("\\s*\\|\\s*");
-        if (parts.length < 3) return null;
+        if (parts.length < 3)
+            return null;
 
         String type = parts[0].trim();
         boolean isDone = "1".equals(parts[1].trim());
@@ -121,24 +129,29 @@ public class Storage {
             switch (type) {
                 case "T": {
                     Task t = new Todo(parts[2].trim());
-                    if (isDone) t.markAsDone();
+                    if (isDone)
+                        t.markAsDone();
                     return t;
                 }
                 case "D": {
-                    if (parts.length < 4) return null;
+                    if (parts.length < 4)
+                        return null;
                     Task t = new Deadline(parts[2].trim(), parts[3].trim());
-                    if (isDone) t.markAsDone();
+                    if (isDone)
+                        t.markAsDone();
                     return t;
                 }
                 case "E": {
                     String desc = parts[2].trim();
                     String from = (parts.length >= 4 ? parts[3].trim() : "");
-                    String to   = (parts.length >= 5 ? parts[4].trim() : "");
+                    String to = (parts.length >= 5 ? parts[4].trim() : "");
                     Task t = new Event(desc, from, to);
-                    if (isDone) t.markAsDone();
+                    if (isDone)
+                        t.markAsDone();
                     return t;
                 }
-                default: return null;
+                default:
+                    return null;
             }
         } catch (Exception ex) {
             return null; // treat as corrupted line
